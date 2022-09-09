@@ -1,0 +1,74 @@
+{
+	"name": "ds_intial_data",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_pedido_sugerido",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "groplatcomlas_data_train_34.parquet",
+				"container": "input"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "Fecha",
+				"type": "DATE"
+			},
+			{
+				"name": "Agencia",
+				"type": "UTF8"
+			},
+			{
+				"name": "Agencia_Nombre",
+				"type": "UTF8"
+			},
+			{
+				"name": "Canal_Nombre",
+				"type": "UTF8"
+			},
+			{
+				"name": "Ruta",
+				"type": "UTF8"
+			},
+			{
+				"name": "Cliente",
+				"type": "UTF8"
+			},
+			{
+				"name": "Producto",
+				"type": "UTF8"
+			},
+			{
+				"name": "Producto_Nombre",
+				"type": "UTF8"
+			},
+			{
+				"name": "Precio",
+				"type": "UTF8"
+			},
+			{
+				"name": "Vida_Anaquel",
+				"type": "UTF8"
+			},
+			{
+				"name": "Venta_Piezas",
+				"type": "INT64"
+			},
+			{
+				"name": "Venta_Neta_Comercial",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "Cluster_Compra",
+				"type": "UTF8"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

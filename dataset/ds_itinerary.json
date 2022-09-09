@@ -1,0 +1,61 @@
+{
+	"name": "ds_itinerary",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_pedido_sugerido",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "future_itinerary34.csv",
+				"container": "input"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "retailer_code",
+				"type": "String"
+			},
+			{
+				"name": "retailer_name",
+				"type": "String"
+			},
+			{
+				"name": "route_code",
+				"type": "String"
+			},
+			{
+				"name": "sales_center_code",
+				"type": "String"
+			},
+			{
+				"name": "sales_center_name",
+				"type": "String"
+			},
+			{
+				"name": "xChannelDistribution",
+				"type": "String"
+			},
+			{
+				"name": "dateVisitPlan",
+				"type": "String"
+			},
+			{
+				"name": "dateVisitPlanName",
+				"type": "String"
+			},
+			{
+				"name": "SemanaParNon",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

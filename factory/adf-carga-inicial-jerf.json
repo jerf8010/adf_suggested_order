@@ -1,0 +1,9 @@
+{
+	"name": "adf-carga-inicial-jerf",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "269ae922-fb57-4a11-9e91-7a3c6c5ad438",
+		"tenantId": "38732645-cc0f-4b23-b208-360eb545b81b"
+	}
+}
