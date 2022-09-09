@@ -1,0 +1,124 @@
+{
+	"name": "ds_parameters",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_pedido_sugerido",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "parameters.json",
+				"container": "parameters"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"preprocess": {
+					"type": "object",
+					"properties": {
+						"parameters": {
+							"type": "object",
+							"properties": {
+								"year": {
+									"type": "integer"
+								},
+								"week": {
+									"type": "integer"
+								},
+								"canal_nombre": {
+									"type": "string"
+								},
+								"agencia_nombre": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									}
+								},
+								"ruta": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									}
+								},
+								"productos": {
+									"type": "string"
+								},
+								"clientes": {
+									"type": "string"
+								},
+								"id_cols": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									}
+								},
+								"ds_col": {
+									"type": "string"
+								},
+								"y_col": {
+									"type": "string"
+								},
+								"freq": {
+									"type": "string"
+								},
+								"recently_added_threshold": {
+									"type": "integer"
+								},
+								"benchmark": {
+									"type": "integer"
+								},
+								"ceased_to_exist_threshold": {
+									"type": "integer"
+								},
+								"benchmark_threshold": {
+									"type": "integer"
+								}
+							}
+						}
+					}
+				},
+				"training": {
+					"type": "object",
+					"properties": {
+						"parameters": {
+							"type": "object",
+							"properties": {
+								"n_pred": {
+									"type": "integer"
+								},
+								"weights": {
+									"type": "array",
+									"items": {
+										"type": "integer"
+									}
+								},
+								"pct_sales": {
+									"type": "array",
+									"items": {
+										"type": "number"
+									}
+								},
+								"validation_window": {
+									"type": "integer"
+								},
+								"tendency_window": {
+									"type": "integer"
+								},
+								"prediction_importance": {
+									"type": "number"
+								},
+								"sales_increase_importance": {
+									"type": "number"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

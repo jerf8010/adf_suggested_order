@@ -1,0 +1,86 @@
+{
+	"name": "df_preprocess_emulator",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_intial_data",
+						"type": "DatasetReference"
+					},
+					"name": "InitialData"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_bimbo_calendar",
+						"type": "DatasetReference"
+					},
+					"name": "calendar"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "FilterByParameters"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "filter3"
+				},
+				{
+					"name": "split1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Fecha as date,",
+				"          Agencia as string,",
+				"          Agencia_Nombre as string,",
+				"          Canal_Nombre as string,",
+				"          Ruta as string,",
+				"          Cliente as string,",
+				"          Producto as string,",
+				"          Producto_Nombre as string,",
+				"          Precio as string,",
+				"          Vida_Anaquel as string,",
+				"          Venta_Piezas as long,",
+				"          Venta_Neta_Comercial as double,",
+				"          Cluster_Compra as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     modifiedAfter: (toTimestamp(1662681600158L)),",
+				"     format: 'parquet') ~> InitialData",
+				"source(output(",
+				"          Fecha as date,",
+				"          sem as string,",
+				"          day as string,",
+				"          year as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> calendar",
+				"InitialData filter(lower(Canal_Nombre) == lower('Detalle') &&\r",
+				"lower(Agencia_Nombre) == lower('Callao') &&\r",
+				"in(['0500', '0515', '0528'], Ruta)\r",
+				") ~> FilterByParameters",
+				"FilterByParameters derive(uid = 'uid_' + Agencia + '_' + Ruta + '_' + Cliente + '_' + Producto) ~> derivedColumn1",
+				"filter2 filter(ERROR_FUNCTION('')) ~> filter1",
+				"filter3 filter(ERROR_FUNCTION('')) ~> filter2",
+				"split1 filter(ERROR_FUNCTION('')) ~> filter3",
+				"calendar split(ERROR_FUNCTION(''),",
+				"     disjoint: false) ~> split1@(, )"
+			]
+		}
+	}
+}
