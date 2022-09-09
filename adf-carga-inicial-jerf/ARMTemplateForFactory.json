@@ -1,0 +1,221 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-carga-inicial-jerf"
+		},
+		"ls_pedido_sugerido_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_pedido_sugerido'"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_bimbo_calendar')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pedido_sugerido",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "bimbo_calendar34.csv",
+						"container": "input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Fecha",
+						"type": "String"
+					},
+					{
+						"name": "sem",
+						"type": "String"
+					},
+					{
+						"name": "day",
+						"type": "String"
+					},
+					{
+						"name": "year",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pedido_sugerido')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_intial_data')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pedido_sugerido",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "groplatcomlas_data_train_34.parquet",
+						"container": "input"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "Fecha",
+						"type": "DATE"
+					},
+					{
+						"name": "Agencia",
+						"type": "UTF8"
+					},
+					{
+						"name": "Agencia_Nombre",
+						"type": "UTF8"
+					},
+					{
+						"name": "Canal_Nombre",
+						"type": "UTF8"
+					},
+					{
+						"name": "Ruta",
+						"type": "UTF8"
+					},
+					{
+						"name": "Cliente",
+						"type": "UTF8"
+					},
+					{
+						"name": "Producto",
+						"type": "UTF8"
+					},
+					{
+						"name": "Producto_Nombre",
+						"type": "UTF8"
+					},
+					{
+						"name": "Precio",
+						"type": "UTF8"
+					},
+					{
+						"name": "Vida_Anaquel",
+						"type": "UTF8"
+					},
+					{
+						"name": "Venta_Piezas",
+						"type": "INT64"
+					},
+					{
+						"name": "Venta_Neta_Comercial",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "Cluster_Compra",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pedido_sugerido')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_itinerary')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pedido_sugerido",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "future_itinerary34.csv",
+						"container": "input"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "retailer_code",
+						"type": "String"
+					},
+					{
+						"name": "retailer_name",
+						"type": "String"
+					},
+					{
+						"name": "route_code",
+						"type": "String"
+					},
+					{
+						"name": "sales_center_code",
+						"type": "String"
+					},
+					{
+						"name": "sales_center_name",
+						"type": "String"
+					},
+					{
+						"name": "xChannelDistribution",
+						"type": "String"
+					},
+					{
+						"name": "dateVisitPlan",
+						"type": "String"
+					},
+					{
+						"name": "dateVisitPlanName",
+						"type": "String"
+					},
+					{
+						"name": "SemanaParNon",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pedido_sugerido')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_pedido_sugerido')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('ls_pedido_sugerido_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
