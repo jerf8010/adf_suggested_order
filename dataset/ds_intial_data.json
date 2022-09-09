@@ -13,7 +13,7 @@
 				"fileName": "groplatcomlas_data_train_34.parquet",
 				"container": "input"
 			},
-			"compressionCodec": "snappy"
+			"compressionCodec": "none"
 		},
 		"schema": [
 			{

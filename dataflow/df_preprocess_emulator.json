@@ -17,9 +17,24 @@
 						"type": "DatasetReference"
 					},
 					"name": "calendar"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_itinerary",
+						"type": "DatasetReference"
+					},
+					"name": "itinerary"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "pivotDevolutions",
+						"type": "DatasetReference"
+					},
+					"name": "SinkPivotDevolutions"
+				}
+			],
 			"transformations": [
 				{
 					"name": "FilterByParameters"
@@ -28,16 +43,22 @@
 					"name": "derivedColumn1"
 				},
 				{
-					"name": "filter1"
+					"name": "FilterWeek"
 				},
 				{
-					"name": "filter2"
+					"name": "JoinItineraryWithCalendar"
 				},
 				{
-					"name": "filter3"
+					"name": "SelectVisitedClients"
 				},
 				{
-					"name": "split1"
+					"name": "SelectColumns"
+				},
+				{
+					"name": "PivotDevolutions"
+				},
+				{
+					"name": "JoinWithItinerary"
 				}
 			],
 			"scriptLines": [
@@ -59,27 +80,77 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
-				"     modifiedAfter: (toTimestamp(1662681600158L)),",
-				"     format: 'parquet') ~> InitialData",
+				"     modifiedAfter: (toTimestamp(1662681600000L)),",
+				"     format: 'parquet',",
+				"     partitionBy('hash', 1)) ~> InitialData",
 				"source(output(",
 				"          Fecha as date,",
-				"          sem as string,",
-				"          day as string,",
-				"          year as string",
+				"          sem as integer,",
+				"          day as integer,",
+				"          year as integer",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> calendar",
+				"source(output(",
+				"          retailer_code as string,",
+				"          retailer_name as string,",
+				"          route_code as string,",
+				"          sales_center_code as string,",
+				"          sales_center_name as string,",
+				"          xChannelDistribution as string,",
+				"          dateVisitPlan as date,",
+				"          dateVisitPlanName as string,",
+				"          SemanaParNon as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> itinerary",
 				"InitialData filter(lower(Canal_Nombre) == lower('Detalle') &&\r",
 				"lower(Agencia_Nombre) == lower('Callao') &&\r",
-				"in(['0500', '0515', '0528'], Ruta)\r",
-				") ~> FilterByParameters",
-				"FilterByParameters derive(uid = 'uid_' + Agencia + '_' + Ruta + '_' + Cliente + '_' + Producto) ~> derivedColumn1",
-				"filter2 filter(ERROR_FUNCTION('')) ~> filter1",
-				"filter3 filter(ERROR_FUNCTION('')) ~> filter2",
-				"split1 filter(ERROR_FUNCTION('')) ~> filter3",
-				"calendar split(ERROR_FUNCTION(''),",
-				"     disjoint: false) ~> split1@(, )"
+				"in(['0500', '0515', '0528'], Ruta),",
+				"     partitionBy('hash', 1)) ~> FilterByParameters",
+				"FilterByParameters derive(uid = 'uid_' + Agencia + '_' + Ruta + '_' + Cliente + '_' + Producto,",
+				"     partitionBy('hash', 1)) ~> derivedColumn1",
+				"calendar filter(year==2022 &&",
+				"sem==34) ~> FilterWeek",
+				"itinerary, FilterWeek join(dateVisitPlan == Fecha,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> JoinItineraryWithCalendar",
+				"JoinItineraryWithCalendar select(mapColumn(",
+				"          retailer_code,",
+				"          sem,",
+				"          year",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectVisitedClients",
+				"JoinWithItinerary select(mapColumn(",
+				"          Fecha,",
+				"          Venta_Piezas,",
+				"          uid",
+				"     ),",
+				"     partitionBy('hash', 1),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectColumns",
+				"SelectColumns pivot(groupBy(uid),",
+				"     pivotBy(Fecha),",
+				"     {} = sum(Venta_Piezas),",
+				"     columnNaming: '$N$V',",
+				"     lateral: true,",
+				"     partitionBy('hash', 1)) ~> PivotDevolutions",
+				"derivedColumn1, SelectVisitedClients join(Cliente == retailer_code,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> JoinWithItinerary",
+				"PivotDevolutions sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['pivot_devolutions_null.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> SinkPivotDevolutions"
 			]
 		}
 	}
